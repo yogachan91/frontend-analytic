@@ -1,0 +1,168 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+All colors MUST be HSL.
+*/
+
+@layer base {
+  :root {
+    /* Cybersecurity SOC Color Palette - Light Mode */
+    --background: 0 0% 100%;
+    --foreground: 222 47% 11%;
+    
+    --card: 0 0% 98%;
+    --card-foreground: 222 47% 11%;
+    
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+    
+    --primary: 189 95% 42%;
+    --primary-foreground: 0 0% 100%;
+    
+    --secondary: 220 13% 95%;
+    --secondary-foreground: 222 47% 11%;
+    
+    --muted: 220 13% 95%;
+    --muted-foreground: 220 9% 46%;
+    
+    --accent: 189 95% 42%;
+    --accent-foreground: 0 0% 100%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 189 95% 42%;
+    
+    --radius: 0.5rem;
+    
+    /* Severity Colors */
+    --severity-critical: 0 84% 60%;
+    --severity-high: 25 95% 53%;
+    --severity-medium: 48 96% 53%;
+    --severity-low: 142 71% 45%;
+    
+    /* Chart Colors */
+    --chart-1: 189 100% 50%;
+    --chart-2: 271 91% 65%;
+    --chart-3: 48 96% 53%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 25 95% 53%;
+    
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 189 95% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 13% 95%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 189 95% 42%;
+  }
+
+  .dark {
+    /* Cybersecurity SOC Color Palette - Dark Mode Primary */
+    --background: 222 47% 11%;
+    --foreground: 220 13% 91%;
+    
+    --card: 222 39% 15%;
+    --card-foreground: 220 13% 91%;
+    
+    --popover: 222 39% 15%;
+    --popover-foreground: 220 13% 91%;
+    
+    --primary: 189 100% 50%;
+    --primary-foreground: 222 47% 11%;
+    
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 220 13% 91%;
+    
+    --muted: 217 33% 17%;
+    --muted-foreground: 220 9% 64%;
+    
+    --accent: 189 100% 50%;
+    --accent-foreground: 222 47% 11%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 220 13% 91%;
+    
+    --border: 217 33% 22%;
+    --input: 217 33% 22%;
+    --ring: 189 100% 50%;
+    
+    /* Severity Colors */
+    --severity-critical: 0 84% 60%;
+    --severity-high: 25 95% 53%;
+    --severity-medium: 48 96% 53%;
+    --severity-low: 142 71% 45%;
+    
+    /* Chart Colors */
+    --chart-1: 189 100% 50%;
+    --chart-2: 271 91% 65%;
+    --chart-3: 48 96% 53%;
+    --chart-4: 142 71% 45%;
+    --chart-5: 25 95% 53%;
+    
+    --sidebar-background: 222 47% 11%;
+    --sidebar-foreground: 220 13% 91%;
+    --sidebar-primary: 189 100% 50%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 17%;
+    --sidebar-accent-foreground: 220 13% 91%;
+    --sidebar-border: 217 33% 22%;
+    --sidebar-ring: 189 100% 50%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Custom scrollbar styling for cybersecurity theme */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-background;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-muted rounded;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-primary/50;
+}
+
+/* Glow effect utility classes */
+.glow-primary {
+  box-shadow: 0 0 20px hsl(var(--primary) / 0.5);
+}
+
+.glow-critical {
+  box-shadow: 0 0 20px hsl(var(--severity-critical) / 0.5);
+}
+
+/* Animation for pulse effect */
+@keyframes pulse-glow {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
