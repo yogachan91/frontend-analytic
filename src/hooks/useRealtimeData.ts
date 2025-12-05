@@ -249,7 +249,7 @@ const REFRESH_INTERVAL = 60000; // 60 seconds
 // Map frontend timeframes to backend timeframes
 const mapTimeframe = (timeframe: TimeframeType): string => {
     const mapping = {
-        today: "last30days",
+        today: "today",
         lastDay: "last24hours",
         lastWeek: "last7days",
         lastMonth: "last30days",

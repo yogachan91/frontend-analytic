@@ -140,7 +140,7 @@ const EVENTS_FILTER_API_URL =
 // Map timeframe frontend → backend
 const mapTimeframe = (timeframe: TimeframeType): string => {
     const mapping: Record<string, string> = {
-        today: "last30days",
+        today: "today",
         lastDay: "last24hours",
         lastWeek: "last7days",
         lastMonth: "last30days",
