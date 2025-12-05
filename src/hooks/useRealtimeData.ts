@@ -244,7 +244,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // Ganti WS_URL menjadi REST_API_URL
 const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
-const REFRESH_INTERVAL = 60000; // 60 seconds
+const REFRESH_INTERVAL = 900000; // 60 seconds
 
 // Map frontend timeframes to backend timeframes
 const mapTimeframe = (timeframe: TimeframeType): string => {
