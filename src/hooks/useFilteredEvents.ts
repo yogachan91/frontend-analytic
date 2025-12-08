@@ -135,7 +135,7 @@ import {
 } from "@/types/security";
 
 const EVENTS_FILTER_API_URL =
-    "http://127.0.0.1:8000/api/threats/events/filter";
+    "http://103.150.227.205:8000/api/threats/events/filter";
 
 // Map timeframe frontend → backend
 const mapTimeframe = (timeframe: TimeframeType): string => {
