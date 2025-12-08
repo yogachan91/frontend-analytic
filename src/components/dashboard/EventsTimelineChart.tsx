@@ -68,7 +68,7 @@ export function EventsTimelineChart({ timeline }: EventsTimelineChartProps) {
               </linearGradient>
             </defs>
             <XAxis
-              dataKey="time"
+              dataKey="fullTime"
               tick={{ fontSize: 9, fill: "hsl(var(--muted-foreground))" }}
               tickLine={false}
               axisLine={{ stroke: "hsl(var(--border))" }}

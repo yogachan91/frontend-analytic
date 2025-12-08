@@ -69,13 +69,18 @@ export function MitreStagesPanel({ stages }: MitreStagesPanelProps) {
                   <span className={cn("text-lg font-bold", isHighest ? "text-primary" : "text-foreground")}>
                     {stage.count}
                   </span>
-                  <span className="text-[10px] text-muted-foreground">/ {totalEvents}</span>
+                  {/* <span className="text-[10px] text-muted-foreground">/ {totalEvents}</span> */}
                 </div>
 
                 {/* Progress Bar */}
                 <div className="space-y-0.5">
-                  <Progress value={stage.percentage} className={cn("h-1", severityProgressStyles[stage.severity])} />
-                  <div className="text-[9px] text-muted-foreground">{Math.round(stage.percentage)}%</div>
+                  <Progress value={Math.round(stage.count / maxCount * 100)} className={cn("h-1", severityProgressStyles[stage.severity])} />
+                  {/* <div className="text-[9px] text-muted-foreground">{Math.round(stage.percentage)}%</div> */}
+                  <div className="text-[9px] text-muted-foreground">{
+    (maxCount && stage.count)
+      ? `${Math.round(stage.count / maxCount * 100)}%`
+      : '0%'
+  }%</div>
                 </div>
 
                 {/* Techniques */}

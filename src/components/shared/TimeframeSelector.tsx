@@ -10,7 +10,7 @@ interface TimeframeSelectorProps {
 
 const timeframes: { value: TimeframeType; label: string }[] = [
   { value: "today", label: "Today" },
-  { value: "lastDay", label: "Last 24h" },
+  { value: "lastDay", label: "Last Day" },
   { value: "lastWeek", label: "Last Week" },
   { value: "lastMonth", label: "Last Month" },
 ];
