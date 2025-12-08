@@ -80,7 +80,7 @@ export function MitreStagesPanel({ stages }: MitreStagesPanelProps) {
     (maxCount && stage.count)
       ? `${Math.round(stage.count / maxCount * 100)}%`
       : '0%'
-  }%</div>
+  }</div>
                 </div>
 
                 {/* Techniques */}
