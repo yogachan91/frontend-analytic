@@ -243,7 +243,7 @@ interface RealtimeData {
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // Ganti WS_URL menjadi REST_API_URL
-const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
+const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
 const REFRESH_INTERVAL = 900000; // 60 seconds
 
 // Map frontend timeframes to backend timeframes

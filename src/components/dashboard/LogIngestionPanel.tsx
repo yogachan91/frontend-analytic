@@ -48,7 +48,7 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
 
         {/* Status Indicator */}
         <div className="flex items-center justify-between p-2 rounded-lg bg-card/50 border border-border">
-          <span className="text-xs font-medium">Status</span>
+          <span className="text-xs font-medium">Connection Status</span>
           <div className="flex items-center gap-2">
             <div className={cn("h-1.5 w-1.5 rounded-full animate-pulse", config.dotClass)} />
             <span className={cn("text-xs font-semibold px-2 py-0.5 rounded-full", config.className)}>
