@@ -1,5 +1,5 @@
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
-import { GlobeMap } from "@/components/dashboard/GlobeMap";
+import { GlobeMap } from "@/components/maps/GlobeMap";
 import { TopIPsPanel } from "@/components/dashboard/TopIPsPanel";
 import { MitreStagesPanel } from "@/components/dashboard/MitreStagesPanel";
 import { LogIngestionPanel } from "@/components/dashboard/LogIngestionPanel";

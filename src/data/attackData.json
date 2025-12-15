@@ -1,0 +1,42 @@
+[
+  {
+    "startLat": 37.7749,
+    "startLng": -122.4194,
+    "endLat": 35.6895,
+    "endLng": 139.6917,
+    "severity": "critical",
+    "type": "DDoS",
+    "source": "USA",
+    "target": "Japan"
+  },
+  {
+    "startLat": 37.7749,
+    "startLng": -122.4194,
+    "endLat": 48.8566,
+    "endLng": 2.3522,
+    "severity": "high",
+    "type": "Brute Force",
+    "source": "USA",
+    "target": "France"
+  },
+  {
+    "startLat": -6.2088,
+    "startLng": 106.8456,
+    "endLat": 1.3521,
+    "endLng": 103.8198,
+    "severity": "medium",
+    "type": "Port Scan",
+    "source": "Indonesia",
+    "target": "Singapore"
+  },
+  {
+    "startLat": 55.7558,
+    "startLng": 37.6173,
+    "endLat": 52.52,
+    "endLng": 13.405,
+    "severity": "low",
+    "type": "Recon",
+    "source": "Rusia",
+    "target": "Denmark"
+  }
+]
