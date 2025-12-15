@@ -1,52 +1,3 @@
-// 'use client';
-
-// import { Globe as GlobeIcon } from 'lucide-react';
-// import { MetricCard } from '@/components/shared/MetricCard';
-// import AttackGlobe, { GlobeAttack } from '@/components/globe/AttackGlobe';
-// import { GeoAttack } from '@/types/security';
-
-// interface GlobeMapProps {
-//   attacks: GeoAttack[];
-// }
-
-// export function GlobeMap({ attacks }: GlobeMapProps) {
-
-//   const globeData: GlobeAttack[] = attacks.map(a => ({
-//     startLat: a.sourceCoords[1],
-//     startLng: a.sourceCoords[0],
-//     endLat: a.destinationCoords[1],
-//     endLng: a.destinationCoords[0],
-//     severity: a.severity,
-//   }));
-
-//   return (
-//     <MetricCard title="Global Attack Map" icon={GlobeIcon} className="h-full">
-//       <div className="relative w-full h-full bg-black rounded-lg overflow-hidden">
-//         <AttackGlobe data={globeData} />
-
-//         {/* Legend */}
-//         <div className="absolute bottom-2 left-2 bg-background/80 backdrop-blur px-3 py-2 rounded text-[10px] space-y-1">
-//           <div className="flex items-center gap-2">
-//             <span className="w-2 h-2 bg-green-500 rounded-full" /> Low
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <span className="w-2 h-2 bg-yellow-500 rounded-full" /> Medium
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <span className="w-2 h-2 bg-orange-500 rounded-full" /> High
-//           </div>
-//           <div className="flex items-center gap-2">
-//             <span className="w-2 h-2 bg-red-500 rounded-full" /> Critical
-//           </div>
-//         </div>
-//       </div>
-
-//       <div className="mt-1 text-[10px] text-muted-foreground text-center">
-//         Real-time 3D attack visualization
-//       </div>
-//     </MetricCard>
-//   );
-// }
 'use client';
 
 import { useNavigate } from 'react-router-dom';
@@ -160,7 +111,6 @@ function Legend({
     </div>
   );
 }
-
 
 
 
