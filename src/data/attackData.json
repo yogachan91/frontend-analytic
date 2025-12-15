@@ -6,18 +6,18 @@
     "endLng": 106.8456,
     "severity": "critical",
     "type": "DDoS",
-    "source": "USA",
+    "source": "United States",
     "target": "Indonesia"
   },
   {
-    "startLat": 37.7749,
-    "startLng": -122.4194,
-    "endLat": 48.8566,
-    "endLng": 2.3522,
+    "startLat": 28.6139,
+    "startLng": 77.2090,
+    "endLat": -6.2088,
+    "endLng": 106.8456,
     "severity": "high",
     "type": "Brute Force",
-    "source": "USA",
-    "target": "France"
+    "source": "India",
+    "target": "Indonesia"
   },
   {
     "startLat": 1.3521,
@@ -30,23 +30,23 @@
     "target": "Indonesia"
   },
   {
-    "startLat": 55.7558,
-    "startLng": 37.6173,
-    "endLat": 52.52,
-    "endLng": 13.405,
+    "startLat": 35.6762,
+    "startLng": 139.6503,
+    "endLat": -6.2088,
+    "endLng": 106.8456,
     "severity": "high",
     "type": "Recon",
-    "source": "Rusia",
-    "target": "Denmark"
+    "source": "Japan",
+    "target": "Indonesia"
   },
   {
-    "startLat": 55.7558,
-    "startLng": 37.6173,
-    "endLat": 37.7749,
-    "endLng": -122.4194,
+    "startLat": 22.3193,
+    "startLng": 114.1694,
+    "endLat": -6.2088,
+    "endLng": 106.8456,
     "severity": "high",
     "type": "Recon",
-    "source": "Rusia",
-    "target": "USA"
+    "source": "Hong Kong",
+    "target": "Indonesia"
   }
 ]
