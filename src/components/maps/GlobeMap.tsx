@@ -13,7 +13,7 @@ import attackData from '@/data/attackData.json';
 /* ================= SOURCE COLOR MAP ================= */
 const SOURCE_COLORS: Record<string, string> = {
   USA: 'bg-blue-500',
-  Japan: 'bg-red-500',
+  Japan: 'bg-gray-400',
   China: 'bg-orange-500',
   Russia: 'bg-yellow-500',
   Iran: 'bg-green-500',
