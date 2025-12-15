@@ -2,12 +2,12 @@
   {
     "startLat": 37.7749,
     "startLng": -122.4194,
-    "endLat": 35.6895,
-    "endLng": 139.6917,
+    "endLat": -6.2088,
+    "endLng": 106.8456,
     "severity": "critical",
     "type": "DDoS",
     "source": "USA",
-    "target": "Japan"
+    "target": "Indonesia"
   },
   {
     "startLat": 37.7749,
@@ -20,23 +20,33 @@
     "target": "France"
   },
   {
-    "startLat": -6.2088,
-    "startLng": 106.8456,
-    "endLat": 1.3521,
-    "endLng": 103.8198,
-    "severity": "medium",
+    "startLat": 1.3521,
+    "startLng": 103.8198,
+    "endLat": -6.2088,
+    "endLng": 106.8456,
+    "severity": "critical",
     "type": "Port Scan",
-    "source": "Indonesia",
-    "target": "Singapore"
+    "source": "Singapore",
+    "target": "Indonesia"
   },
   {
     "startLat": 55.7558,
     "startLng": 37.6173,
     "endLat": 52.52,
     "endLng": 13.405,
-    "severity": "low",
+    "severity": "high",
     "type": "Recon",
     "source": "Rusia",
     "target": "Denmark"
+  },
+  {
+    "startLat": 55.7558,
+    "startLng": 37.6173,
+    "endLat": 37.7749,
+    "endLng": -122.4194,
+    "severity": "high",
+    "type": "Recon",
+    "source": "Rusia",
+    "target": "USA"
   }
 ]
