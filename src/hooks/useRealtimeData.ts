@@ -242,10 +242,9 @@ interface RealtimeData {
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
-// Ganti WS_URL menjadi REST_API_URL
-// const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
+// URL API dan Interval
 const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
-const REFRESH_INTERVAL = 900000; // 60 seconds
+const REFRESH_INTERVAL = 900000; // 15 minutes (900000 ms), disarankan untuk diperpendek (misalnya 60000 ms / 60 detik)
 
 // Map frontend timeframes to backend timeframes
 const mapTimeframe = (timeframe: TimeframeType): string => {
@@ -263,40 +262,31 @@ const mapTimeframe = (timeframe: TimeframeType): string => {
 const parseIPThreat = (threat: any): IPThreat => ({
     ip: threat.ip,
     severity: threat.severity.toLowerCase() as SeverityLevel,
-    // Membulatkan magnitude
-    magnitude: Math.round(threat.score), 
+    magnitude: Math.round(threat.score),
     eventCount: threat.event_count,
     lastSeen: new Date(),
 });
 
 const parseGeoAttack = (rawAttack: any): GeoAttack => {
-    // Memastikan koordinat adalah number dan bukan null
     const srcLng = rawAttack.source_longitude || 0;
     const srcLat = rawAttack.source_latitude || 0;
     const dstLng = rawAttack.destination_longitude || 0;
     const dstLat = rawAttack.destination_latitude || 0;
 
     return {
-        // Mapping ke interface GeoAttack:
         sourceCountry: rawAttack.country || 'Unknown',
         destinationCountry: rawAttack.destination_country || 'Unknown',
         severity: rawAttack.severity.toLowerCase() as SeverityLevel,
-        
-        // attackCount adalah 1 per event yang diparsing dari backend
         attackCount: 1, 
-        
-        // Memetakan ke format koordinat [longitude, latitude]
         sourceCoords: [srcLng, srcLat],
         destinationCoords: [dstLng, dstLat],
     };
 };
 
-// Helper untuk mendapatkan ID yang aman dari nama stage MITRE
 const mapMitreStageId = (stageName: string): string => {
     return stageName.toLowerCase().replace(/\s+/g, '_');
 };
 
-// Fungsi Parsing untuk MITRE Stages
 const parseMitreStage = (rawStage: any): MitreStage => ({
     id: mapMitreStageId(rawStage.stages) as any, 
     name: rawStage.stages,
@@ -307,14 +297,18 @@ const parseMitreStage = (rawStage: any): MitreStage => ({
     severity: rawStage.severity, 
 });
 
-// Fungsi helper untuk menggabungkan data timeline dari semua event type
+/**
+ * Menggabungkan data timeline dari semua event type
+ * Data ini digunakan untuk EventsTimelineChart.
+ */
 const aggregateTimelineData = (eventsList: any[]): TimelineDataPoint[] => {
     const aggregatedMap = new Map<string, number>();
 
     eventsList.forEach(eventType => {
+        // Hanya proses jika eventType memiliki array timeline
         if (eventType.timeline && Array.isArray(eventType.timeline)) {
             eventType.timeline.forEach((point: any) => {
-                const dateKey = point.timeline;
+                const dateKey = point.timeline; // Misalnya: "2025-12-15"
                 const currentCount = aggregatedMap.get(dateKey) || 0;
                 aggregatedMap.set(dateKey, currentCount + point.count);
             });
@@ -327,23 +321,22 @@ const aggregateTimelineData = (eventsList: any[]): TimelineDataPoint[] => {
         finalTimeline.push({
             timestamp: new Date(dateString),
             attackCount: count,
-            severity: "medium", 
+            severity: "medium", // Severity di chart timeline seringkali default
         });
     });
 
+    // Urutkan berdasarkan waktu
     return finalTimeline.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 };
 
+// Helper untuk mendapatkan total event berdasarkan event_type
+const findEventTotal = (eventsList: any[], type: string): number => {
+    const item = eventsList.find(e => e.event_type.toLowerCase() === type.toLowerCase());
+    return item ? item.total : 0;
+};
 
-const parseLogIngestion = (log: any): LogIngestion => ({
-    ...log,
-    // Perlu disesuaikan jika API tidak mengembalikan 'lastUpdate'
-    lastUpdate: new Date(), 
-});
 
-// ✅ PERBAIKAN: Tambahkan 'index' sebagai argumen dan pastikan ID unik
 const parseSecurityEvent = (event: any, index: number): SecurityEvent => ({
-    // Gunakan ID event yang ada, atau buat ID unik menggunakan Date.now() dan index
     id: event.id || `event-${Date.now()}-${index}`, 
     ...event,
     timestamp: new Date(event.timestamp),
@@ -352,7 +345,7 @@ const parseSecurityEvent = (event: any, index: number): SecurityEvent => ({
 // --- Hook useRealtimeData yang Diperbarui ---
 
 export function useRealtimeData(
-    enabled: boolean = true, // enabled = isRealtime
+    enabled: boolean = true, 
     timeframe: TimeframeType = "today"
 ) {
     const [data, setData] = useState<RealtimeData>({
@@ -363,11 +356,11 @@ export function useRealtimeData(
         logIngestion: {
             totalEvents: 0,
             eventsPerSecond: 0,
-            trendData: [],
+            trendData: [], // Digunakan untuk 3 Bar di LogIngestionPanel
             status: "healthy",
             lastUpdate: new Date(),
         },
-        timeline: [],
+        timeline: [], // Digunakan untuk EventsTimelineChart
     });
 
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
@@ -375,12 +368,10 @@ export function useRealtimeData(
 
     const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    // Fungsi untuk mengambil data menggunakan REST API
     const fetchData = useCallback(async () => {
-        // ... (Logika status connecting)
         if (connectionStatus === "disconnected") {
-             console.log("[CONNECTION STATUS] Koneksi diinisiasi/disambungkan kembali.");
-             setConnectionStatus("connecting");
+            console.log("[CONNECTION STATUS] Koneksi diinisiasi/disambungkan kembali.");
+            setConnectionStatus("connecting");
         }
 
         const currentBackendTimeframe = mapTimeframe(timeframe);
@@ -389,7 +380,7 @@ export function useRealtimeData(
             filters: [],
         };
         
-        console.log(`[REQUEST 📬] Mengirimkan permintaan REST API untuk timeframe: ${timeframe} (${currentBackendTimeframe})`, payload);
+        console.log(`[REQUEST 📬] Mengirimkan permintaan REST API untuk timeframe: ${timeframe}`, payload);
 
         try {
             
@@ -401,68 +392,72 @@ export function useRealtimeData(
                 body: JSON.stringify(payload),
             });
 
-            // 1. Cek status HTTP
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
             }
 
-            // 2. Ambil raw response JSON
             const rawResponse = await response.json();
-            
             const safeResponse = rawResponse || {}; 
             
-            console.log(`[RESPONSE RAW 📦] Data JSON Penuh diterima untuk timeframe: ${timeframe}`, safeResponse);
+            console.log(`[RESPONSE RAW 📦] Data JSON diterima.`, safeResponse);
 
-            // 3. Gunakan safeResponse untuk parsing data
+            // 1. Parsing Data Ringkasan Utama
             const parsedIPThreats = (safeResponse.summary || []).map(parseIPThreat);
             const parsedMitreStages = (safeResponse.mitre || []).map(parseMitreStage);
-            
-            // 🆕 Ambil data 'global_attack' dan parse menjadi GeoAttack
             const parsedGeoAttacks = (safeResponse.global_attack || []).map(parseGeoAttack);
             
-            const eventsList = safeResponse.events?.[0]?.list || [];
-            const aggregatedTimeline = aggregateTimelineData(eventsList);
+            // 2. Data untuk LOG INGESTION PANEL (3 Bar)
+            // Menggunakan "events_ingest" jika tersedia
+            const ingestionSource = safeResponse.events_ingest?.[0]; 
+            const ingestionList = ingestionSource?.list || [];
             
-            const trendDataPoints = aggregatedTimeline.map(point => point.attackCount);
+            const suricataTotal = findEventTotal(ingestionList, "suricata");
+            const sophosTotal = findEventTotal(ingestionList, "sophos");
+            const panwTotal = findEventTotal(ingestionList, "panw");
+            const trendDataPoints: number[] = [suricataTotal, sophosTotal, panwTotal]; 
+            
+            // 3. Data untuk EVENTS TIMELINE CHART (Line Chart) dan Daftar Events
+            // Menggunakan "events" (yang berisi array timeline per event type)
+            const timelineSource = safeResponse.events?.[0];
+            const timelineList = timelineSource?.list || [];
+            
+            const aggregatedTimeline = aggregateTimelineData(timelineList); 
 
-
+            // 4. Membangun State Akhir
             const parsedData: RealtimeData = {
                 ipThreats: parsedIPThreats,
-                
-                // ✅ PERBAIKAN: Berikan index ke parseSecurityEvent
-                events: (safeResponse.events?.[0]?.list || []).map((event: any, index: number) => parseSecurityEvent(event, index)), 
-                
-                // 🆕 Update state geoAttacks
                 geoAttacks: parsedGeoAttacks, 
-                
                 mitreStages: parsedMitreStages, 
                 
-                logIngestion: safeResponse.events?.[0]
+                // Daftar events (bisa diambil dari timelineSource)
+                events: (timelineSource?.list || []).map((event: any, index: number) => parseSecurityEvent(event, index)),
+                
+                // State Log Ingestion
+                logIngestion: ingestionSource
                     ? {
-                        totalEvents: safeResponse.events[0].total,
-                        eventsPerSecond: safeResponse.events[0].seconds,
-                        trendData: trendDataPoints, 
+                        totalEvents: ingestionSource.total,
+                        eventsPerSecond: ingestionSource.seconds,
+                        trendData: trendDataPoints, // Data 3 Bar
                         status: "healthy", 
                         lastUpdate: new Date(), 
                     }
                     : data.logIngestion,
                     
-                timeline: aggregatedTimeline, 
+                // State Timeline Chart
+                timeline: aggregatedTimeline, // Data Line Chart
             };
 
             setData(parsedData);
             setLastUpdate(new Date());
-            setConnectionStatus("connected"); // Status berubah ke 'Live' / 'Terhubung'
+            setConnectionStatus("connected"); 
         } catch (error) {
             console.error(`[ERROR ❌] Gagal mengambil atau memproses data untuk timeframe ${timeframe}:`, error);
             setConnectionStatus("disconnected"); 
         }
-    }, [enabled, timeframe, data.logIngestion, connectionStatus]); 
+    }, [timeframe, connectionStatus]); // Menghapus data.logIngestion dari dependency karena sudah diperbaiki
 
-    // ... (Logika useEffect dan refreshData)
-    // Efek TERPISAH untuk memastikan fetchData dipanggil ketika timeframe/enabled berubah
+    // Efek untuk Polling dan Refresh
     useEffect(() => {
-        // 1. Pastikan logika interval/polling sebelumnya dibersihkan
         if (refreshIntervalRef.current) {
             clearInterval(refreshIntervalRef.current);
             refreshIntervalRef.current = null;
@@ -470,10 +465,10 @@ export function useRealtimeData(
 
         console.log(`[HOOK TRIGGER ⏰] Timeframe/Realtime mode berubah. Memulai fetch data...`);
         
-        // 2. PANGGIL FETCH DATA SEGERA
+        // PANGGIL FETCH DATA SEGERA
         fetchData();
 
-        // 3. SET INTERVAL POLLING BARU HANYA jika enabled (Realtime mode)
+        // SET INTERVAL POLLING BARU HANYA jika enabled (Realtime mode)
         if (enabled) {
             console.log(`[POLLING ♻️] Memulai polling data setiap ${REFRESH_INTERVAL / 1000} detik.`);
             refreshIntervalRef.current = setInterval(fetchData, REFRESH_INTERVAL);
