@@ -17,7 +17,7 @@ export function TopIPsPanel({ threats }: TopIPsPanelProps) {
     navigate(navigateToSearchWithIP(ip));
   };
 
-  const criticalHighThreats = threats.filter((threat) => threat.severity === "medium" || threat.severity === "low");
+  const criticalHighThreats = threats.filter((threat) => threat.severity === "critical" || threat.severity === "high");
 
   return (
     <MetricCard title="Top 5 Critical Threats" icon={AlertTriangle} className="h-full">
