@@ -188,7 +188,7 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
 
                 {/* 4. Trend Sparkline -> DIUBAH MENJADI 3 BAR COUNT */}
                 <div className="space-y-1">
-                    <div className="text-xs font-medium">Last 1 Hour</div>
+                    <div className="text-xs font-medium"></div>
                     <div className="h-20 flex items-end justify-around gap-4">
                         {data.trendData.map((value, index) => {
                             const config = eventTypeMap[index];

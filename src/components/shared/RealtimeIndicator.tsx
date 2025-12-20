@@ -54,7 +54,8 @@ export function RealtimeIndicator({
         </span>
         {lastUpdate && isActive && connectionStatus === "connected" && (
           <span className="text-xs text-muted-foreground">
-            Updated {formatDistanceToNow(lastUpdate, { addSuffix: true })}
+            Updated Just Now
+            {/* {formatDistanceToNow(lastUpdate, { addSuffix: true })} */}
           </span>
         )}
       </div>

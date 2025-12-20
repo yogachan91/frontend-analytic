@@ -58,7 +58,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
         <AttackGlobe data={globeData} />
 
         {/* ================= LEGEND ================= */}
-        <div className="absolute bottom-2 left-2 z-10 bg-background/80 backdrop-blur px-3 py-2 rounded text-[10px] space-y-2">
+        <div className="absolute bottom-[70px] left-2 z-10 bg-background/80 backdrop-blur px-3 py-2 rounded text-[10px] space-y-2">
 
           {/* Severity */}
           <div>
@@ -66,20 +66,23 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
             <Legend label="High" color="bg-orange-500" />
             <Legend label="Critical" color="bg-red-500" />
           </div>
-
-          {/* Source + Count (CLICKABLE) */}
-          <div>
-            <div className="font-semibold mb-1 mt-2">Source</div>
-            {Object.entries(sourceCount).map(([source, count]) => (
-              <Legend
-                key={source}
-                label={`${source} : ${count}`}
-                color={SOURCE_COLORS[source] ?? 'bg-gray-400'}
-                onClick={() => handleCountryClick(source)}
-              />
-            ))}
-          </div>
         </div>
+        {/* Source + Count (CLICKABLE) */}
+        <div className="absolute bottom-2 left-2 z-10 bg-background/80 backdrop-blur px-3 py-2 rounded text-[10px] space-y-2">
+          <div>
+            <div className="font-semibold mb-1 mt-2">Source Country</div>
+              <div className="flex flex-wrap gap-x-3 gap-y-1">
+                {Object.entries(sourceCount).map(([source, count]) => (
+                  <Legend
+                    key={source}
+                    label={`${source} : ${count}`}
+                    color={SOURCE_COLORS[source] ?? 'bg-gray-400'}
+                    onClick={() => handleCountryClick(source)}
+                  />
+                ))}
+              </div>
+          </div>
+        </div>  
       </div>
 
       <div className="mt-1 text-[10px] text-muted-foreground text-center">
