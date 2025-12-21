@@ -175,6 +175,77 @@
 
 // export default SearchDashboard;
 
+// import { useState, useEffect } from "react";
+// import { useSearchParams } from "react-router-dom";
+// import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+// import { SearchBar } from "@/components/search/SearchBar";
+// import { FilterPanel } from "@/components/search/FilterPanel";
+// import { EventsTable } from "@/components/search/EventsTable";
+
+// import { useTimeframe } from "@/hooks/useTimeframe";
+// import { useFilteredEvents } from "@/hooks/useFilteredEvents";
+// import { parseFiltersFromURL } from "@/utils/navigation";
+// import { DashboardFilter } from "@/types/security";
+
+// const SearchDashboard = () => {
+//   const { timeframe, setTimeframe } = useTimeframe();
+//   const [searchParams] = useSearchParams();
+
+//   const [searchQuery, setSearchQuery] = useState("");
+//   const [filters, setFilters] = useState<DashboardFilter[]>([]);
+
+//   // Ambil data dari backend dengan hook baru
+//   const { events: filteredEvents, loading, totalCount } = useFilteredEvents(
+//     timeframe,
+//     searchQuery,
+//     filters
+//   );
+
+//   // Parse filters dari URL hanya saat halaman pertama kali dibuka
+//   useEffect(() => {
+//     const urlFilters = parseFiltersFromURL(searchParams);
+//     if (urlFilters.length > 0) {
+//       setFilters(urlFilters);
+//     }
+//   }, [searchParams]);
+
+//   return (
+//     <DashboardLayout
+//       timeframe={timeframe}
+//       onTimeframeChange={setTimeframe}
+//       isRealtime={false} // Search mode = historical mode
+//       connectionStatus={loading ? "connecting" : "connected"}
+//     >
+//       <div className="space-y-6">
+//         <h2 className="text-2xl font-bold text-foreground">Search Events</h2>
+
+//         {/* Search + Filters */}
+//         <div className="space-y-4">
+//           <SearchBar 
+//             value={searchQuery}
+//             onChange={setSearchQuery}
+//             placeholder="Search by IP, event type, description..."
+//           />
+
+//           <FilterPanel 
+//             filters={filters}
+//             onFiltersChange={setFilters}
+//           />
+//         </div>
+
+//         {/* Table Section */}
+//         <EventsTable 
+//           events={filteredEvents}
+//           loading={loading}
+//           totalCount={totalCount}
+//         />
+//       </div>
+//     </DashboardLayout>
+//   );
+// };
+
+// export default SearchDashboard;
+
 import { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
@@ -185,7 +256,7 @@ import { EventsTable } from "@/components/search/EventsTable";
 import { useTimeframe } from "@/hooks/useTimeframe";
 import { useFilteredEvents } from "@/hooks/useFilteredEvents";
 import { parseFiltersFromURL } from "@/utils/navigation";
-import { DashboardFilter } from "@/types/security";
+import { DashboardFilter, LogicType } from "@/types/security";
 
 const SearchDashboard = () => {
   const { timeframe, setTimeframe } = useTimeframe();
@@ -194,11 +265,19 @@ const SearchDashboard = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<DashboardFilter[]>([]);
 
+  // 🔥 STATE BARU: AND / OR (DEFAULT AND)
+  const [operatorLogic, setOperatorLogic] = useState<LogicType>("AND");
+
   // Ambil data dari backend dengan hook baru
-  const { events: filteredEvents, loading, totalCount } = useFilteredEvents(
+  const {
+    events: filteredEvents,
+    loading,
+    totalCount,
+  } = useFilteredEvents(
     timeframe,
     searchQuery,
-    filters
+    filters,
+    operatorLogic // 🔥 KIRIM KE BACKEND
   );
 
   // Parse filters dari URL hanya saat halaman pertama kali dibuka
@@ -213,7 +292,7 @@ const SearchDashboard = () => {
     <DashboardLayout
       timeframe={timeframe}
       onTimeframeChange={setTimeframe}
-      isRealtime={false} // Search mode = historical mode
+      isRealtime={false}
       connectionStatus={loading ? "connecting" : "connected"}
     >
       <div className="space-y-6">
@@ -221,20 +300,22 @@ const SearchDashboard = () => {
 
         {/* Search + Filters */}
         <div className="space-y-4">
-          <SearchBar 
+          <SearchBar
             value={searchQuery}
             onChange={setSearchQuery}
             placeholder="Search by IP, event type, description..."
           />
 
-          <FilterPanel 
+          <FilterPanel
             filters={filters}
+            operatorLogic={operatorLogic}     // ✅ FIX
             onFiltersChange={setFilters}
+            onLogicChange={setOperatorLogic} // ✅ FIX
           />
         </div>
 
         {/* Table Section */}
-        <EventsTable 
+        <EventsTable
           events={filteredEvents}
           loading={loading}
           totalCount={totalCount}
@@ -245,3 +326,4 @@ const SearchDashboard = () => {
 };
 
 export default SearchDashboard;
+

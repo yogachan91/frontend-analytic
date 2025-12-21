@@ -80,6 +80,8 @@ export interface TimelineDataPoint {
 
 export type TimeframeType = "today" | "lastDay" | "lastWeek" | "lastMonth";
 
+export type LogicType = "AND" | "OR";
+
 export interface DashboardFilter {
   field: string;
   operator: "is" | "is_not" | "contains" | "exists" | "greater_than" | "less_than";

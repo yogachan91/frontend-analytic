@@ -188,42 +188,45 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
 
                 {/* 4. Trend Sparkline -> DIUBAH MENJADI 3 BAR COUNT */}
                 <div className="space-y-1">
-                    <div className="text-xs font-medium"></div>
-                    <div className="h-20 flex items-end justify-around gap-4">
-                        {data.trendData.map((value, index) => {
-                            const config = eventTypeMap[index];
-                            if (!config) return null; // Hanya tampilkan 3 bar (Suricata, Sophos, Panw)
+  <div className="h-28 flex items-end justify-around gap-4">
+    {data.trendData.map((value, index) => {
+      const config = eventTypeMap[index];
+      if (!config) return null;
 
-                            let height = (value / scaleMax) * 100;
-                            // Tambahkan min height untuk bar yang memiliki count > 0 agar tetap terlihat
-                            height = value > 0 && height < 2 ? 2 : height; 
+      let height = (value / scaleMax) * 100;
+      height = value > 0 && height < 5 ? 5 : height;
 
-                            return (
-                                <div 
-                                    key={index}
-                                    className="flex flex-col items-center justify-end h-full flex-1 min-w-0"
-                                >
-                                    {/* Count di atas Bar */}
-                                    <div className="text-[10px] text-muted-foreground mb-1 font-semibold tabular-nums">
-                                        {value.toLocaleString()}
-                                    </div>
-                                    <div
-                                        className={cn(
-                                            "w-full max-w-[30px] rounded-t transition-all duration-300 ease-in-out",
-                                            config.className,
-                                        )}
-                                        style={{ height: `${height}%` }}
-                                        title={`${config.label}: ${value.toLocaleString()} events`}
-                                    />
-                                    {/* Label di bawah Bar */}
-                                    <div className="text-[10px] font-medium text-center mt-1 truncate">
-                                        {config.label.toUpperCase()}
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
+      return (
+        <div
+          key={index}
+          className="flex flex-col items-center justify-end flex-1 min-w-[70px]"
+        >
+          {/* COUNT */}
+          <div className="text-[10px] text-muted-foreground mb-1 font-semibold tabular-nums">
+            {value.toLocaleString()}
+          </div>
+
+          {/* BAR AREA (INI KUNCINYA) */}
+          <div className="relative h-16 w-full flex items-end justify-center">
+            <div
+              className={cn(
+                "w-full max-w-[30px] rounded-t transition-all duration-300 ease-in-out",
+                config.className
+              )}
+              style={{ height: `${Math.min(height, 100)}%` }}
+              title={`${config.label}: ${value.toLocaleString()} events`}
+            />
+          </div>
+
+          {/* LABEL */}
+          <div className="text-[10px] font-medium text-center mt-1 whitespace-nowrap">
+            {config.label.toUpperCase()}
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
 
                 {/* 5. Last Update */}
                 <div className="text-[10px] text-muted-foreground text-center flex-shrink-0">
