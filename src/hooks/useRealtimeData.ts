@@ -242,10 +242,9 @@ interface RealtimeData {
 
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
-// URL API dan Interval
- const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
-// const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
-// const REFRESH_INTERVAL = 900000; // 15 minutes (900000 ms), disarankan untuk diperpendek (misalnya 60000 ms / 60 detik)
+// --- PERUBAHAN DISINI: Arahkan ke Backend Utama (Proxy) ---
+// Gunakan port 8080 (Backend Utama) dan endpoint proxy /api/threats/summary
+const REST_API_URL = "http://103.150.227.205:8080/api/threats/summary";
 const REFRESH_INTERVAL = 5000;
 
 // Map frontend timeframes to backend timeframes
@@ -299,18 +298,13 @@ const parseMitreStage = (rawStage: any): MitreStage => ({
     severity: rawStage.severity, 
 });
 
-/**
- * Menggabungkan data timeline dari semua event type
- * Data ini digunakan untuk EventsTimelineChart.
- */
 const aggregateTimelineData = (eventsList: any[]): TimelineDataPoint[] => {
     const aggregatedMap = new Map<string, number>();
 
     eventsList.forEach(eventType => {
-        // Hanya proses jika eventType memiliki array timeline
         if (eventType.timeline && Array.isArray(eventType.timeline)) {
             eventType.timeline.forEach((point: any) => {
-                const dateKey = point.timeline; // Misalnya: "2025-12-15"
+                const dateKey = point.timeline; 
                 const currentCount = aggregatedMap.get(dateKey) || 0;
                 aggregatedMap.set(dateKey, currentCount + point.count);
             });
@@ -323,20 +317,17 @@ const aggregateTimelineData = (eventsList: any[]): TimelineDataPoint[] => {
         finalTimeline.push({
             timestamp: new Date(dateString),
             attackCount: count,
-            severity: "medium", // Severity di chart timeline seringkali default
+            severity: "medium", 
         });
     });
 
-    // Urutkan berdasarkan waktu
     return finalTimeline.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
 };
 
-// Helper untuk mendapatkan total event berdasarkan event_type
 const findEventTotal = (eventsList: any[], type: string): number => {
     const item = eventsList.find(e => e.event_type.toLowerCase() === type.toLowerCase());
     return item ? item.total : 0;
 };
-
 
 const parseSecurityEvent = (event: any, index: number): SecurityEvent => ({
     id: event.id || `event-${Date.now()}-${index}`, 
@@ -358,11 +349,11 @@ export function useRealtimeData(
         logIngestion: {
             totalEvents: 0,
             eventsPerSecond: 0,
-            trendData: [], // Digunakan untuk 3 Bar di LogIngestionPanel
+            trendData: [], 
             status: "warning",
             lastUpdate: new Date(),
         },
-        timeline: [], // Digunakan untuk EventsTimelineChart
+        timeline: [], 
     });
 
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
@@ -377,22 +368,35 @@ export function useRealtimeData(
         }
 
         const currentBackendTimeframe = mapTimeframe(timeframe);
+        
+        // --- PERUBAHAN DISINI: Ambil Token dari localStorage ---
+        const token = localStorage.getItem('access_token');
+        
         const payload = {
             timeframe: currentBackendTimeframe,
             filters: [],
         };
         
-        console.log(`[REQUEST 📬] Mengirimkan permintaan REST API untuk timeframe: ${timeframe}`, payload);
+        console.log(`[REQUEST 📬] Mengirimkan permintaan REST API ke Proxy: ${timeframe}`, payload);
 
         try {
-            
             const response = await fetch(REST_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
+                    // --- PERUBAHAN DISINI: Sertakan Authorization Header ---
+                    'Authorization': token ? `Bearer ${token}` : '',
                 },
                 body: JSON.stringify(payload),
             });
+
+            // Handle jika tidak authorized (401)
+            if (response.status === 401) {
+                console.warn("[AUTH 🔑] Token expired atau tidak valid. Menghentikan polling.");
+                setConnectionStatus("disconnected");
+                // Opsional: localStorage.removeItem('access_token'); window.location.href = '/auth';
+                return;
+            }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
@@ -401,28 +405,15 @@ export function useRealtimeData(
             const rawResponse = await response.json();
             const safeResponse = rawResponse || {}; 
             
-            console.log(`[RESPONSE RAW 📦] Data JSON diterima.`, safeResponse);
+            console.log(`[RESPONSE RAW 📦] Data JSON diterima dari Proxy.`, safeResponse);
 
-            // 1. Parsing Data Ringkasan Utama
             const isElasticConnected: "healthy" | "warning" =
             safeResponse?.status_connect?.connected ? "healthy" : "warning";
-
-            // 2️⃣ Baru update state pakai nilainya
-            setData(prev => ({
-                ...prev,
-                logIngestion: {
-                    ...prev.logIngestion,
-                    status: isElasticConnected,
-                    lastUpdate: new Date(),
-                },
-            }));
 
             const parsedIPThreats = (safeResponse.summary || []).map(parseIPThreat);
             const parsedMitreStages = (safeResponse.mitre || []).map(parseMitreStage);
             const parsedGeoAttacks = (safeResponse.global_attack || []).map(parseGeoAttack);
             
-            // 2. Data untuk LOG INGESTION PANEL (3 Bar)
-            // Menggunakan "events_ingest" jika tersedia
             const ingestionSource = safeResponse.events_ingest?.[0]; 
             const ingestionList = ingestionSource?.list || [];
             
@@ -431,47 +422,37 @@ export function useRealtimeData(
             const panwTotal = findEventTotal(ingestionList, "panw");
             const trendDataPoints: number[] = [suricataTotal, sophosTotal, panwTotal]; 
             
-            // 3. Data untuk EVENTS TIMELINE CHART (Line Chart) dan Daftar Events
-            // Menggunakan "events" (yang berisi array timeline per event type)
             const timelineSource = safeResponse.events?.[0];
             const timelineList = timelineSource?.list || [];
             
             const aggregatedTimeline = aggregateTimelineData(timelineList); 
 
-            // 4. Membangun State Akhir
             const parsedData: RealtimeData = {
                 ipThreats: parsedIPThreats,
                 geoAttacks: parsedGeoAttacks, 
                 mitreStages: parsedMitreStages, 
-                
-                // Daftar events (bisa diambil dari timelineSource)
                 events: (timelineSource?.list || []).map((event: any, index: number) => parseSecurityEvent(event, index)),
-                
-                // State Log Ingestion
                 logIngestion: ingestionSource
                     ? {
                         totalEvents: ingestionSource.total,
                         eventsPerSecond: ingestionSource.seconds,
-                        trendData: trendDataPoints, // Data 3 Bar
+                        trendData: trendDataPoints, 
                         status: isElasticConnected, 
                         lastUpdate: new Date(), 
                     }
-                    : data.logIngestion,
-                    
-                // State Timeline Chart
-                timeline: aggregatedTimeline, // Data Line Chart
+                    : { ...data.logIngestion, status: isElasticConnected },
+                timeline: aggregatedTimeline, 
             };
 
             setData(parsedData);
             setLastUpdate(new Date());
             setConnectionStatus("connected"); 
         } catch (error) {
-            console.error(`[ERROR ❌] Gagal mengambil atau memproses data untuk timeframe ${timeframe}:`, error);
+            console.error(`[ERROR ❌] Gagal mengambil data via Proxy untuk timeframe ${timeframe}:`, error);
             setConnectionStatus("disconnected"); 
         }
-    }, [timeframe, connectionStatus]); // Menghapus data.logIngestion dari dependency karena sudah diperbaiki
+    }, [timeframe, connectionStatus, data.logIngestion]); 
 
-    // Efek untuk Polling dan Refresh
     useEffect(() => {
         if (refreshIntervalRef.current) {
             clearInterval(refreshIntervalRef.current);
@@ -479,17 +460,13 @@ export function useRealtimeData(
         }
 
         console.log(`[HOOK TRIGGER ⏰] Timeframe/Realtime mode berubah. Memulai fetch data...`);
-        
-        // PANGGIL FETCH DATA SEGERA
         fetchData();
 
-        // SET INTERVAL POLLING BARU HANYA jika enabled (Realtime mode)
         if (enabled) {
             console.log(`[POLLING ♻️] Memulai polling data setiap ${REFRESH_INTERVAL / 1000} detik.`);
             refreshIntervalRef.current = setInterval(fetchData, REFRESH_INTERVAL);
         }
 
-        // Cleanup function:
         return () => {
             if (refreshIntervalRef.current) {
                 clearInterval(refreshIntervalRef.current);
@@ -497,7 +474,6 @@ export function useRealtimeData(
         };
     }, [enabled, timeframe, fetchData]);
 
-    // Fungsi refresh manual
     const refreshData = useCallback(() => {
         console.log(`[MANUAL REFRESH] Memuat ulang data untuk timeframe ${timeframe}.`);
         fetchData();

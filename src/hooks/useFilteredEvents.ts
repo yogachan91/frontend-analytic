@@ -266,8 +266,10 @@ import {
   LogicType,
 } from "@/types/security";
 
- const EVENTS_FILTER_API_URL = "http://103.150.227.205:8000/api/threats/events/filter";
-// const EVENTS_FILTER_API_URL = "http://127.0.0.1:8000/api/threats/events/filter";
+// --- PERUBAHAN DISINI: Arahkan ke Backend Utama (Proxy) ---
+// Gunakan port 8080 dan pastikan path sesuai dengan yang ada di elastic_routes.py
+// const EVENTS_FILTER_API_URL = "http://127.0.0.1:8080/api/threats/filter";
+const EVENTS_FILTER_API_URL = "http://103.150.227.205:8080/api/threats/filter";
 
 // Map timeframe frontend → backend
 const mapTimeframe = (timeframe: TimeframeType): string => {
@@ -330,6 +332,9 @@ export function useFilteredEvents(
   const fetchEvents = useCallback(async () => {
     setLoading(true);
 
+    // --- PERUBAHAN DISINI: Ambil Token dari localStorage ---
+    const token = localStorage.getItem('access_token');
+
     try {
       const payload = {
         timeframe: mapTimeframe(timeframe),
@@ -338,16 +343,28 @@ export function useFilteredEvents(
         search_query: searchQuery,
       };
 
+      console.log(`[FILTER REQUEST 🔍] Mengirim filter ke Proxy:`, payload);
+
       const response = await fetch(EVENTS_FILTER_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          // --- PERUBAHAN DISINI: Tambahkan Bearer Token ---
+          "Authorization": token ? `Bearer ${token}` : '',
         },
         body: JSON.stringify(payload),
       });
 
+      // Handle status Unauthorized (401)
+      if (response.status === 401) {
+        console.warn("[AUTH 🔑] Sesi berakhir atau token tidak valid pada Filter API.");
+        setLoading(false);
+        return;
+      }
+
       if (!response.ok) {
         console.error("API Error:", response.status);
+        setLoading(false);
         return;
       }
 
