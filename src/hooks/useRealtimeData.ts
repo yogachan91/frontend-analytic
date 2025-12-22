@@ -244,7 +244,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // --- PERUBAHAN DISINI: Arahkan ke Backend Utama (Proxy) ---
 // Gunakan port 8080 (Backend Utama) dan endpoint proxy /api/threats/summary
-const REST_API_URL = "http://103.150.227.205:8080/api/threats/summary";
+const REST_API_URL = "http://192.168.33.91:8080/api/threats/summary";
 const REFRESH_INTERVAL = 5000;
 
 // Map frontend timeframes to backend timeframes
