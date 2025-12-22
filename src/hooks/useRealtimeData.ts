@@ -243,8 +243,8 @@ interface RealtimeData {
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // URL API dan Interval
- const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
-// const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
+// const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
+ const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
 // const REFRESH_INTERVAL = 900000; // 15 minutes (900000 ms), disarankan untuk diperpendek (misalnya 60000 ms / 60 detik)
 const REFRESH_INTERVAL = 5000;
 
@@ -359,7 +359,7 @@ export function useRealtimeData(
             totalEvents: 0,
             eventsPerSecond: 0,
             trendData: [], // Digunakan untuk 3 Bar di LogIngestionPanel
-            status: "healthy",
+            status: "warning",
             lastUpdate: new Date(),
         },
         timeline: [], // Digunakan untuk EventsTimelineChart
@@ -404,6 +404,19 @@ export function useRealtimeData(
             console.log(`[RESPONSE RAW 📦] Data JSON diterima.`, safeResponse);
 
             // 1. Parsing Data Ringkasan Utama
+            const isElasticConnected: "healthy" | "warning" =
+            safeResponse?.status_connect?.connected ? "healthy" : "warning";
+
+            // 2️⃣ Baru update state pakai nilainya
+            setData(prev => ({
+                ...prev,
+                logIngestion: {
+                    ...prev.logIngestion,
+                    status: isElasticConnected,
+                    lastUpdate: new Date(),
+                },
+            }));
+
             const parsedIPThreats = (safeResponse.summary || []).map(parseIPThreat);
             const parsedMitreStages = (safeResponse.mitre || []).map(parseMitreStage);
             const parsedGeoAttacks = (safeResponse.global_attack || []).map(parseGeoAttack);
@@ -440,7 +453,7 @@ export function useRealtimeData(
                         totalEvents: ingestionSource.total,
                         eventsPerSecond: ingestionSource.seconds,
                         trendData: trendDataPoints, // Data 3 Bar
-                        status: "healthy", 
+                        status: isElasticConnected, 
                         lastUpdate: new Date(), 
                     }
                     : data.logIngestion,
