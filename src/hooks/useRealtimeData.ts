@@ -377,7 +377,7 @@ export function useRealtimeData(
             filters: [],
         };
         
-        console.log(`[REQUEST 📬] Mengirimkan permintaan REST API ke Proxy: ${timeframe}`, payload);
+        // console.log(`[REQUEST 📬] Mengirimkan permintaan REST API ke Proxy: ${timeframe}`, payload);
 
         try {
             const response = await fetch(REST_API_URL, {
@@ -405,7 +405,7 @@ export function useRealtimeData(
             const rawResponse = await response.json();
             const safeResponse = rawResponse || {}; 
             
-            console.log(`[RESPONSE RAW 📦] Data JSON diterima dari Proxy.`, safeResponse);
+            // console.log(`[RESPONSE RAW 📦] Data JSON diterima dari Proxy.`, safeResponse);
 
             const isElasticConnected: "healthy" | "warning" =
             safeResponse?.status_connect?.connected ? "healthy" : "warning";
@@ -459,11 +459,11 @@ export function useRealtimeData(
             refreshIntervalRef.current = null;
         }
 
-        console.log(`[HOOK TRIGGER ⏰] Timeframe/Realtime mode berubah. Memulai fetch data...`);
+        // console.log(`[HOOK TRIGGER ⏰] Timeframe/Realtime mode berubah. Memulai fetch data...`);
         fetchData();
 
         if (enabled) {
-            console.log(`[POLLING ♻️] Memulai polling data setiap ${REFRESH_INTERVAL / 1000} detik.`);
+            // console.log(`[POLLING ♻️] Memulai polling data setiap ${REFRESH_INTERVAL / 1000} detik.`);
             refreshIntervalRef.current = setInterval(fetchData, REFRESH_INTERVAL);
         }
 
@@ -475,7 +475,7 @@ export function useRealtimeData(
     }, [enabled, timeframe, fetchData]);
 
     const refreshData = useCallback(() => {
-        console.log(`[MANUAL REFRESH] Memuat ulang data untuk timeframe ${timeframe}.`);
+        // console.log(`[MANUAL REFRESH] Memuat ulang data untuk timeframe ${timeframe}.`);
         fetchData();
     }, [fetchData, timeframe]);
 
