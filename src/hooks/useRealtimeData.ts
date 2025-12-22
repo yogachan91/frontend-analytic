@@ -243,8 +243,8 @@ interface RealtimeData {
 type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // URL API dan Interval
-// const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
- const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
+ const REST_API_URL = "http://103.150.227.205:8000/api/threats/events/summary";
+// const REST_API_URL = "http://127.0.0.1:8000/api/threats/events/summary";
 // const REFRESH_INTERVAL = 900000; // 15 minutes (900000 ms), disarankan untuk diperpendek (misalnya 60000 ms / 60 detik)
 const REFRESH_INTERVAL = 5000;
 
