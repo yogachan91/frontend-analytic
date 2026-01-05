@@ -257,6 +257,7 @@
 //     return { events, loading, totalCount };
 // }
 
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useState, useEffect, useCallback } from "react";
 import {
   SecurityEvent,
@@ -333,7 +334,7 @@ export function useFilteredEvents(
     setLoading(true);
 
     // --- PERUBAHAN DISINI: Ambil Token dari localStorage ---
-    const token = localStorage.getItem('access_token');
+    // const token = localStorage.getItem('access_token');
 
     try {
       const payload = {
@@ -345,22 +346,21 @@ export function useFilteredEvents(
 
       console.log(`[FILTER REQUEST 🔍] Mengirim filter ke Proxy:`, payload);
 
-      const response = await fetch(EVENTS_FILTER_API_URL, {
-        method: "POST",
+      const response = await fetchWithAuth(EVENTS_FILTER_API_URL, {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
-          // --- PERUBAHAN DISINI: Tambahkan Bearer Token ---
-          "Authorization": token ? `Bearer ${token}` : '',
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
       });
 
+
       // Handle status Unauthorized (401)
-      if (response.status === 401) {
-        console.warn("[AUTH 🔑] Sesi berakhir atau token tidak valid pada Filter API.");
-        setLoading(false);
-        return;
-      }
+      // if (response.status === 401) {
+      //   console.warn("[AUTH 🔑] Sesi berakhir atau token tidak valid pada Filter API.");
+      //   setLoading(false);
+      //   return;
+      // }
 
       if (!response.ok) {
         console.error("API Error:", response.status);

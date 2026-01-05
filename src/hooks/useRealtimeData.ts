@@ -219,6 +219,7 @@
 //   };
 // }
 
+import { fetchWithAuth } from "@/lib/fetchWithAuth";
 import { useState, useEffect, useCallback, useRef } from "react";
 import {
     SecurityEvent,
@@ -370,7 +371,7 @@ export function useRealtimeData(
         const currentBackendTimeframe = mapTimeframe(timeframe);
         
         // --- PERUBAHAN DISINI: Ambil Token dari localStorage ---
-        const token = localStorage.getItem('access_token');
+        // const token = localStorage.getItem('access_token');
         
         const payload = {
             timeframe: currentBackendTimeframe,
@@ -380,23 +381,22 @@ export function useRealtimeData(
         // console.log(`[REQUEST 📬] Mengirimkan permintaan REST API ke Proxy: ${timeframe}`, payload);
 
         try {
-            const response = await fetch(REST_API_URL, {
+            const response = await fetchWithAuth(REST_API_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    // --- PERUBAHAN DISINI: Sertakan Authorization Header ---
-                    'Authorization': token ? `Bearer ${token}` : '',
                 },
                 body: JSON.stringify(payload),
             });
 
+
             // Handle jika tidak authorized (401)
-            if (response.status === 401) {
-                console.warn("[AUTH 🔑] Token expired atau tidak valid. Menghentikan polling.");
-                setConnectionStatus("disconnected");
-                // Opsional: localStorage.removeItem('access_token'); window.location.href = '/auth';
-                return;
-            }
+            // if (response.status === 401) {
+            //     console.warn("[AUTH 🔑] Token expired atau tidak valid. Menghentikan polling.");
+            //     setConnectionStatus("disconnected");
+            //     // Opsional: localStorage.removeItem('access_token'); window.location.href = '/auth';
+            //     return;
+            // }
 
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status} - ${response.statusText}`);
