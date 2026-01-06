@@ -16,20 +16,22 @@ export async function fetchWithAuth(
     },
   });
 
-  // 🔁 ACCESS TOKEN EXPIRED
   if (response.status === 401) {
-    const refreshToken = localStorage.getItem("refresh_token");
+    console.warn("[AUTH] Access token expired, refreshing...");
 
+    const refreshToken = localStorage.getItem("refresh_token");
     if (!refreshToken) {
       throw new Error("No refresh token");
     }
 
-    // 🔑 KIRIM REFRESH TOKEN VIA AUTH HEADER
     const refreshResponse = await fetch(`${API_URL}/auth/refresh`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${refreshToken}`,
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify({
+        refresh_token: refreshToken,
+      }),
     });
 
     if (!refreshResponse.ok) {
@@ -40,10 +42,9 @@ export async function fetchWithAuth(
 
     const refreshData = await refreshResponse.json();
 
-    // ✅ SIMPAN TOKEN BARU
     localStorage.setItem("access_token", refreshData.access_token);
 
-    // 🔁 ULANGI REQUEST AWAL DENGAN TOKEN BARU
+    // ulangi request awal
     response = await fetch(input, {
       ...init,
       headers: {
@@ -51,7 +52,8 @@ export async function fetchWithAuth(
         Authorization: `Bearer ${refreshData.access_token}`,
       },
     });
-    console.log('[FETCH STATUS]', response.status);
+
+    console.log("[FETCH STATUS AFTER REFRESH]", response.status);
   }
 
   return response;
