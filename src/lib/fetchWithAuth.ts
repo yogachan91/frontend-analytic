@@ -51,6 +51,7 @@ export async function fetchWithAuth(
         Authorization: `Bearer ${refreshData.access_token}`,
       },
     });
+    console.log('[FETCH STATUS]', response.status);
   }
 
   return response;
