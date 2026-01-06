@@ -506,6 +506,7 @@ const Auth = () => {
 
         if (response.ok) {
           localStorage.setItem('access_token', data.access_token);
+          localStorage.setItem('refresh_token', data.refresh_token);
           toast({
             title: "Welcome back!",
             description: "You've successfully logged in.",
