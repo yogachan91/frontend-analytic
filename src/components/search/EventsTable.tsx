@@ -174,6 +174,14 @@ interface EventsTableProps {
   totalCount?: number;
 }
 
+function formatTimestamp(timestamp: string | Date) {
+  const d = new Date(timestamp);
+
+  const pad = (n: number) => n.toString().padStart(2, "0");
+
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 export function EventsTable({ events }: EventsTableProps) {
   const [expandedEventId, setExpandedEventId] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -232,7 +240,7 @@ export function EventsTable({ events }: EventsTableProps) {
                         )}
                       </TableCell>
 
-                      <TableCell>{event.timestamp.toISOString()}</TableCell>
+                      <TableCell>{formatTimestamp(event.timestamp)}</TableCell>
                       <TableCell>{event.sourceIP}</TableCell>
                       <TableCell>{event.destinationIP}</TableCell>
                       <TableCell>{event.sourceCountry}</TableCell>
