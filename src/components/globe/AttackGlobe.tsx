@@ -74,17 +74,10 @@ export default function AttackGlobe({ data }: AttackGlobeProps) {
 
     /* ---------------- Globe ---------------- */
     const globe = new Globe()
-<<<<<<< HEAD
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .showAtmosphere(true)
       .atmosphereColor('#1e40af')
-=======
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .showAtmosphere(true)
-      .atmosphereColor('#60a5fa')
->>>>>>> e55eac19ae05cd348d367ff29004425b19f6f7b1
       .atmosphereAltitude(0.35);
 
     scene.add(globe);
