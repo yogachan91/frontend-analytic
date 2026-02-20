@@ -63,7 +63,7 @@ export function TopIPsPanel({ threats }: TopIPsPanelProps) {
 
                   {/* Event Count */}
                   <div className="text-[10px] text-muted-foreground">
-                    {threat.eventCount} events
+                    {threat.eventCount.toLocaleString()} events
                   </div>
                 </div>
               </div>

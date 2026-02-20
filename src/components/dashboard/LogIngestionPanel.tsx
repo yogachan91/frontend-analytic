@@ -88,10 +88,11 @@
 //     </MetricCard>
 //   );
 // }
-
+import { useNavigate } from "react-router-dom";
 import { LogIngestion } from "@/types/security";
 import { MetricCard } from "@/components/shared/MetricCard";
 import { Activity, TrendingUp } from "lucide-react";
+import { navigateToSearchWithEventType } from "@/utils/navigation";
 import { cn } from "@/lib/utils";
 
 interface LogIngestionPanelProps {
@@ -99,6 +100,7 @@ interface LogIngestionPanelProps {
 }
 
 export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
+    const navigate = useNavigate();
     const statusConfig = {
         // ... (Konfigurasi statusConfig tetap sama)
         healthy: {
@@ -145,6 +147,7 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
         const config = eventTypeMap[index] || { label: `Unknown ${index}`, className: "bg-gray-400", textColor: "text-white" };
         return { 
             label: `${config.label}: ${total.toLocaleString()}`, // Contoh: Suricata: 0
+            judul: config.label,
             className: config.className,
             textColor: config.textColor
         };
@@ -153,6 +156,10 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
     // ✅ HITUNG TOTAL MAKSIMUM untuk scaling 3 Bar
     const maxIngestionCount = Math.max(0, ...data.trendData);
     const scaleMax = maxIngestionCount > 0 ? maxIngestionCount : 1; 
+
+    const handleStageClick = (stageId: string) => {
+        navigate(navigateToSearchWithEventType(stageId as any));
+      };
 
 
     return (
@@ -238,8 +245,9 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
                     <div className="text-xs font-medium mb-2 text-center text-muted-foreground">Ingestion Summary</div>
                     <div className="flex flex-wrap justify-center gap-2">
                         {trendLegend.map((item) => (
-                            <div 
+                            <button 
                                 key={item.label} 
+                                onClick={() => handleStageClick(item.judul)}
                                 className={cn(
                                     "flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[10px] font-semibold",
                                     item.className,
@@ -247,7 +255,7 @@ export function LogIngestionPanel({ data }: LogIngestionPanelProps) {
                                 )}
                             >
                                 {item.label}
-                            </div>
+                            </button>
                         ))}
                     </div>
                 </div>

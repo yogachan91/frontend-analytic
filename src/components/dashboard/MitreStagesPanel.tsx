@@ -67,7 +67,7 @@ export function MitreStagesPanel({ stages }: MitreStagesPanelProps) {
                 {/* Count Fraction */}
                 <div className="flex items-baseline gap-1">
                   <span className={cn("text-lg font-bold", isHighest ? "text-primary" : "text-foreground")}>
-                    {stage.count}
+                    {stage.count.toLocaleString()}
                   </span>
                   {/* <span className="text-[10px] text-muted-foreground">/ {totalEvents}</span> */}
                 </div>

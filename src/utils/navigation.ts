@@ -42,6 +42,16 @@ export function navigateToSearchWithMitreStage(stage: MitreStageType): string {
   ]);
 }
 
+export function navigateToSearchWithEventType(stage: MitreStageType): string {
+  return buildSearchURL([
+    {
+      field: "event_type",
+      operator: "is",
+      value: stage,
+    },
+  ]);
+}
+
 export function parseFiltersFromURL(searchParams: URLSearchParams): DashboardFilter[] {
   const filters: DashboardFilter[] = [];
   const filterIndices = new Set<number>();
