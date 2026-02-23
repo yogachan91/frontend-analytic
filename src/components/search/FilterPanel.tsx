@@ -219,7 +219,6 @@ const fields = [
   { value: "mitre_stages", label: "MITRE Stage" },
   { value: "protocol", label: "Protocol" },
   { value: "port", label: "Port" },
-  { value: "application", label: "Application" },
 ];
 
 const operators = [
