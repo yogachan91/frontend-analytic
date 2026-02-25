@@ -433,7 +433,7 @@ import { z } from 'zod';
 import { Shield } from 'lucide-react';
 
 // URL API diambil dari variabel lingkungan
-const API_URL = import.meta.env.VITE_API_URL || 'http://192.168.33.91:8080/api';
+ const API_URL = import.meta.env.VITE_API_URL || 'http://192.168.33.91:8080/api';
 // const API_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8080/api';
 
 const authSchema = z.object({

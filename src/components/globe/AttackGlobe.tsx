@@ -11,7 +11,7 @@ export type GlobeAttack = {
   startLng: number;
   endLat: number;
   endLng: number;
-  severity: 'low' | 'medium' | 'high' | 'critical' | 'informational' | 'notice';
+  severity: 'low' | 'medium' | 'high' | 'critical' | 'Information' | 'Notice';
   source: string;
 };
 
@@ -88,7 +88,7 @@ export default function AttackGlobe({ data }: AttackGlobeProps) {
       medium: ['#eab308', '#ca8a04'],
       high: ['#f97316', '#ea580c'],
       critical: ['#ef4444', '#b91c1c'],
-      informational: ['#38bdf8', '#0284c7'],
+      information: ['#eab308', '#ca8a04'],
       notice: ['#a855f7', '#7e22ce'],
     };
 

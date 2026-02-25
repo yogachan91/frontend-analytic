@@ -270,7 +270,7 @@ import {
 // --- PERUBAHAN DISINI: Arahkan ke Backend Utama (Proxy) ---
 // Gunakan port 8080 dan pastikan path sesuai dengan yang ada di elastic_routes.py
 // const EVENTS_FILTER_API_URL = "http://127.0.0.1:8080/api/threats/filter";
-const EVENTS_FILTER_API_URL = "http://192.168.33.91:8080/api/threats/filter";
+ const EVENTS_FILTER_API_URL = "http://192.168.33.91:8080/api/threats/filter";
 
 // Map timeframe frontend → backend
 const mapTimeframe = (timeframe: TimeframeType): string => {

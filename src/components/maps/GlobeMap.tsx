@@ -42,13 +42,15 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
           endLng: a.destinationCoords[0],
           severity: a.severity,
           source: a.sourceCountry ?? 'Unknown',
+          attackCount: a.attackCount
         }))
       : (attackData as GlobeAttack[]);
 
   /* ================= COUNT PER SOURCE ================= */
-  const sourceCount = globeData.reduce<Record<string, number>>((acc, item) => {
-    const key = item.source ?? 'Unknown';
-    acc[key] = (acc[key] || 0) + 1;
+  const sourceCount = (attacks || []).reduce<Record<string, number>>((acc, item) => {
+    const key = item.sourceCountry ?? 'Unknown';
+    // Gunakan attackCount dari JSON, bukan + 1
+    acc[key] = (acc[key] || 0) + item.attackCount; 
     return acc;
   }, {});
 
@@ -65,6 +67,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
             <div className="font-semibold mb-1">Severity</div>
             <Legend label="High" color="bg-orange-500" />
             <Legend label="Critical" color="bg-red-500" />
+            <Legend label="Information" color="bg-yellow-500" />
           </div>
         </div>
         {/* Source + Count (CLICKABLE) */}
@@ -76,7 +79,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
                   <Legend
                     key={source}
                     label={`${source} : ${count}`}
-                    color={SOURCE_COLORS[source] ?? 'bg-gray-400'}
+                    color={SOURCE_COLORS[source] ?? 'bg-yellow-400'}
                     onClick={() => handleCountryClick(source)}
                   />
                 ))}

@@ -245,7 +245,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 
 // --- PERUBAHAN DISINI: Arahkan ke Backend Utama (Proxy) ---
 // Gunakan port 8080 (Backend Utama) dan endpoint proxy /api/threats/summary
-const REST_API_URL = "http://192.168.33.91:8080/api/threats/summary";
+ const REST_API_URL = "http://192.168.33.91:8080/api/threats/summary";
 // const REST_API_URL = "http://127.0.0.1:8080/api/threats/summary";
 const REFRESH_INTERVAL = 300000;
 
@@ -280,7 +280,7 @@ const parseGeoAttack = (rawAttack: any): GeoAttack => {
         sourceCountry: rawAttack.country || 'Unknown',
         destinationCountry: rawAttack.destination_country || 'Unknown',
         severity: rawAttack.severity.toLowerCase() as SeverityLevel,
-        attackCount: 1, 
+        attackCount: rawAttack.count || 0, 
         sourceCoords: [srcLng, srcLat],
         destinationCoords: [dstLng, dstLat],
     };
