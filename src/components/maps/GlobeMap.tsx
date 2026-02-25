@@ -12,12 +12,12 @@ import attackData from '@/data/attackData.json';
 
 /* ================= SOURCE COLOR MAP ================= */
 const SOURCE_COLORS: Record<string, string> = {
-  USA: 'bg-blue-500',
-  Japan: 'bg-gray-400',
-  China: 'bg-orange-500',
+  USA: 'bg-yellow-500',
+  Japan: 'bg-yellow-400',
+  China: 'bg-yellow-500',
   Russia: 'bg-yellow-500',
-  Iran: 'bg-green-500',
-  Unknown: 'bg-gray-400',
+  Iran: 'bg-yellow-500',
+  Unknown: 'bg-yellow-400',
 };
 
 interface GlobeMapProps {
