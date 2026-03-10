@@ -3,7 +3,7 @@
 import { useNavigate } from 'react-router-dom';
 import { Globe as GlobeIcon } from 'lucide-react';
 import { MetricCard } from '@/components/shared/MetricCard';
-import AttackGlobe, { GlobeAttack } from '@/components/globe/AttackGlobe';
+import AttackGlobe, { MapAttack} from '@/components/globe/AttackMap2D';
 import { navigateToSearchWithCountry } from '@/utils/navigation';
 import { GeoAttack } from '@/types/security';
 
@@ -33,7 +33,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
   };
 
   /* ================= DATA ================= */
-  const globeData: GlobeAttack[] =
+  const globeData: MapAttack[] =
     attacks && attacks.length > 0
       ? attacks.map(a => ({
           startLat: a.sourceCoords[1],
@@ -44,7 +44,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
           source: a.sourceCountry ?? 'Unknown',
           attackCount: a.attackCount
         }))
-      : (attackData as GlobeAttack[]);
+      : (attackData as MapAttack[]);
 
   /* ================= COUNT PER SOURCE ================= */
   const sourceCount = (attacks || []).reduce<Record<string, number>>((acc, item) => {

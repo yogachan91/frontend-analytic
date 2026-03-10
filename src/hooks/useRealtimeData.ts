@@ -247,7 +247,7 @@ type ConnectionStatus = "connecting" | "connected" | "disconnected";
 // Gunakan port 8080 (Backend Utama) dan endpoint proxy /api/threats/summary
  const REST_API_URL = "http://192.168.33.91:8080/api/threats/summary";
 // const REST_API_URL = "http://127.0.0.1:8080/api/threats/summary";
-const REFRESH_INTERVAL = 900000;
+const REFRESH_INTERVAL = 10000;
 
 // Map frontend timeframes to backend timeframes
 const mapTimeframe = (timeframe: TimeframeType): string => {
@@ -343,6 +343,7 @@ export function useRealtimeData(
     enabled: boolean = true, 
     timeframe: TimeframeType = "today"
 ) {
+    const [isLoading, setIsLoading] = useState<boolean>(false);
     const [data, setData] = useState<RealtimeData>({
         events: [],
         ipThreats: [],
@@ -358,12 +359,20 @@ export function useRealtimeData(
         timeline: [], 
     });
 
+    const dataRef = useRef(data);
+    useEffect(() => {
+        dataRef.current = data;
+    }, [data]);
+
     const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("disconnected");
     const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
 
     const refreshIntervalRef = useRef<NodeJS.Timeout | null>(null);
 
-    const fetchData = useCallback(async () => {
+    const fetchData = useCallback(async (showLoading: boolean = true) => {
+        if (showLoading) {
+            setIsLoading(true);
+        }
         if (connectionStatus === "disconnected") {
             console.log("[CONNECTION STATUS] Koneksi diinisiasi/disambungkan kembali.");
             setConnectionStatus("connecting");
@@ -441,7 +450,8 @@ export function useRealtimeData(
                         status: isElasticConnected, 
                         lastUpdate: new Date(), 
                     }
-                    : { ...data.logIngestion, status: isElasticConnected },
+                //    : { ...data.logIngestion, status: isElasticConnected },
+                : { ...dataRef.current.logIngestion, status: isElasticConnected },
                 timeline: aggregatedTimeline, 
             };
 
@@ -451,8 +461,12 @@ export function useRealtimeData(
         } catch (error) {
             console.error(`[ERROR ❌] Gagal mengambil data via Proxy untuk timeframe ${timeframe}:`, error);
             setConnectionStatus("disconnected"); 
+        } finally {
+            // SET LOADING FALSE setelah selesai (berhasil atau gagal)
+            setIsLoading(false);
         }
-    }, [timeframe, connectionStatus, data.logIngestion]); 
+    //}, [timeframe, connectionStatus, data.logIngestion]); 
+    }, [timeframe, connectionStatus]); 
 
     useEffect(() => {
         if (refreshIntervalRef.current) {
@@ -461,11 +475,14 @@ export function useRealtimeData(
         }
 
         // console.log(`[HOOK TRIGGER ⏰] Timeframe/Realtime mode berubah. Memulai fetch data...`);
-        fetchData();
+        fetchData(true);
 
         if (enabled) {
             // console.log(`[POLLING ♻️] Memulai polling data setiap ${REFRESH_INTERVAL / 1000} detik.`);
-            refreshIntervalRef.current = setInterval(fetchData, REFRESH_INTERVAL);
+            // refreshIntervalRef.current = setInterval(fetchData, REFRESH_INTERVAL);
+            refreshIntervalRef.current = setInterval(() => {
+                fetchData(false);
+            }, REFRESH_INTERVAL);
         }
 
         return () => {
@@ -477,11 +494,12 @@ export function useRealtimeData(
 
     const refreshData = useCallback(() => {
         // console.log(`[MANUAL REFRESH] Memuat ulang data untuk timeframe ${timeframe}.`);
-        fetchData();
-    }, [fetchData, timeframe]);
+        fetchData(true);
+    }, [fetchData]);
 
     return {
         ...data,
+        isLoading,
         refreshData,
         connectionStatus,
         lastUpdate,
