@@ -330,8 +330,10 @@ export function useFilteredEvents(
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
-  const fetchEvents = useCallback(async () => {
-    setLoading(true);
+  const fetchEvents = useCallback(async (showLoading: boolean = true) => {
+    if (showLoading) {
+      setLoading(true);
+    }
 
     // --- PERUBAHAN DISINI: Ambil Token dari localStorage ---
     // const token = localStorage.getItem('access_token');
@@ -383,11 +385,22 @@ export function useFilteredEvents(
     }
   }, [timeframe, searchQuery, filters, operatorLogic]);
 
+  // useEffect(() => {
+  //   fetchEvents();
+  // }, [fetchEvents]);
+  // EFFECT 1: Khusus untuk memicu loading saat TIMEFRAME berubah
   useEffect(() => {
-    fetchEvents();
-  }, [fetchEvents]);
+    fetchEvents(true); // Panggil dengan loading true
+  }, [timeframe]); // Hanya trigger jika timeframe berubah
 
-  return { events, loading, totalCount };
+  // EFFECT 2: Untuk perubahan filter atau search query (opsional: tanpa loading berat)
+  useEffect(() => {
+    // Kita cek jika ini bukan mount pertama atau bukan karena ganti timeframe
+    // agar tidak double fetch dengan effect di atas
+    fetchEvents(true); 
+  }, [searchQuery, filters, operatorLogic, fetchEvents]);
+
+  return { events, loading, totalCount, refetch: () => fetchEvents(true) };
 }
 
 

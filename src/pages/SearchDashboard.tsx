@@ -257,17 +257,29 @@ import { useTimeframe } from "@/hooks/useTimeframe";
 import { useFilteredEvents } from "@/hooks/useFilteredEvents";
 import { parseFiltersFromURL } from "@/utils/navigation";
 import { DashboardFilter, LogicType } from "@/types/security";
+import { Loader2 } from "lucide-react";
 
 const SearchDashboard = () => {
   const { timeframe, setTimeframe } = useTimeframe();
   const [searchParams] = useSearchParams();
 
+  const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<DashboardFilter[]>([]);
 
   // 🔥 STATE BARU: AND / OR (DEFAULT AND)
   const [operatorLogic, setOperatorLogic] = useState<LogicType>("AND");
 
+  // LOGIKA DEBOUNCE:
+  // Menunggu user berhenti mengetik selama 500ms sebelum memperbarui searchQuery
+  useEffect(() => {
+    const delayDebounceFn = setTimeout(() => {
+      setSearchQuery(inputValue);
+    }, 3000);
+
+    return () => clearTimeout(delayDebounceFn);
+  }, [inputValue]);
+  
   // Ambil data dari backend dengan hook baru
   const {
     events: filteredEvents,
@@ -282,6 +294,11 @@ const SearchDashboard = () => {
 
   // Parse filters dari URL hanya saat halaman pertama kali dibuka
   useEffect(() => {
+    const urlLogic = searchParams.get("logic") as LogicType;
+    if (urlLogic) {
+      setOperatorLogic(urlLogic);
+    }
+    
     const urlFilters = parseFiltersFromURL(searchParams);
     if (urlFilters.length > 0) {
       setFilters(urlFilters);
@@ -295,6 +312,14 @@ const SearchDashboard = () => {
       isRealtime={false}
       connectionStatus={loading ? "connecting" : "connected"}
     >
+      {loading && (
+      <div className="absolute inset-0 z-50 flex items-center justify-center bg-background/60 backdrop-blur-sm">
+        <div className="flex flex-col items-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <p className="mt-2 text-sm font-medium">Filtering Events...</p>
+        </div>
+      </div>
+      )}
       <div className="space-y-6">
         <h2 className="text-2xl font-bold text-foreground">Search Events</h2>
 

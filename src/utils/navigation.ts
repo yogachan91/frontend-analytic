@@ -1,7 +1,22 @@
 import { DashboardFilter, MitreStageType } from "@/types/security";
 
-export function buildSearchURL(filters: DashboardFilter[]): string {
+// export function buildSearchURL(filters: DashboardFilter[]): string {
+//   const params = new URLSearchParams();
+  
+//   filters.forEach((filter, index) => {
+//     params.append(`filter_${index}_field`, filter.field);
+//     params.append(`filter_${index}_operator`, filter.operator);
+//     params.append(`filter_${index}_value`, filter.value);
+//   });
+  
+//   return `/search?${params.toString()}`;
+// }
+
+export function buildSearchURL(filters: DashboardFilter[], logic: string = "AND"): string {
   const params = new URLSearchParams();
+  
+  // Masukkan logic ke URL
+  params.append("logic", logic);
   
   filters.forEach((filter, index) => {
     params.append(`filter_${index}_field`, filter.field);
@@ -22,6 +37,16 @@ export function navigateToSearchWithCountry(country: string): string {
   ]);
 }
 
+// export function navigateToSearchWithIP(ip: string): string {
+//   return buildSearchURL([
+//     {
+//       field: "source_ip",
+//       operator: "is",
+//       value: ip,
+//     },
+//   ]);
+// }
+
 export function navigateToSearchWithIP(ip: string): string {
   return buildSearchURL([
     {
@@ -29,7 +54,12 @@ export function navigateToSearchWithIP(ip: string): string {
       operator: "is",
       value: ip,
     },
-  ]);
+    {
+      field: "destination_ip",
+      operator: "is",
+      value: ip,
+    },
+  ], "OR"); // Tambahkan parameter "OR" di sini
 }
 
 export function navigateToSearchWithMitreStage(stage: MitreStageType): string {
