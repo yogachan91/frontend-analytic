@@ -258,7 +258,7 @@
 // }
 
 import { fetchWithAuth } from "@/lib/fetchWithAuth";
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import {
   SecurityEvent,
   TimeframeType,
@@ -330,7 +330,23 @@ export function useFilteredEvents(
   const [loading, setLoading] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
 
+  const abortControllerRef = useRef<AbortController | null>(null);
+
   const fetchEvents = useCallback(async (showLoading: boolean = true) => {
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
+    const controller = new AbortController();
+    abortControllerRef.current = controller;
+
+  const urlParams = new URLSearchParams(window.location.search);
+  const hasFilterInUrl = urlParams.has("filter") || urlParams.has("q");
+    
+    if (hasFilterInUrl && filters.length === 0 && !searchQuery) {
+      return; 
+    }
+
     if (showLoading) {
       setLoading(true);
     }
@@ -354,6 +370,7 @@ export function useFilteredEvents(
           'Content-Type': 'application/json',
         },
         body: JSON.stringify(payload),
+        signal: controller.signal,
       });
 
 
@@ -379,9 +396,15 @@ export function useFilteredEvents(
       setEvents(parsedEvents);
       setTotalCount(data.count ?? parsedEvents.length);
     } catch (error) {
-      console.error("Error fetching events:", error);
+      if (error.name === 'AbortError') {
+        console.log("[FETCH] Request dibatalkan karena ada filter baru.");
+      } else {
+        console.error("Error fetching events:", error);
+      }
     } finally {
-      setLoading(false);
+      if (controller === abortControllerRef.current) {
+        setLoading(false);
+      }
     }
   }, [timeframe, searchQuery, filters, operatorLogic]);
 
@@ -398,6 +421,11 @@ export function useFilteredEvents(
     // Kita cek jika ini bukan mount pertama atau bukan karena ganti timeframe
     // agar tidak double fetch dengan effect di atas
     fetchEvents(true); 
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
   }, [fetchEvents]);
 
   return { events, loading, totalCount, refetch: () => fetchEvents(true) };
