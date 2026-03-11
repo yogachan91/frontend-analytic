@@ -265,8 +265,10 @@ const SearchDashboard = () => {
 
   const [inputValue, setInputValue] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
-  const [filters, setFilters] = useState<DashboardFilter[]>([]);
-
+  // const [filters, setFilters] = useState<DashboardFilter[]>([]);
+  const [filters, setFilters] = useState<DashboardFilter[]>(() => 
+    parseFiltersFromURL(searchParams)
+  );
   // 🔥 STATE BARU: AND / OR (DEFAULT AND)
   const [operatorLogic, setOperatorLogic] = useState<LogicType>("AND");
 
@@ -294,7 +296,8 @@ const SearchDashboard = () => {
 
   // Parse filters dari URL hanya saat halaman pertama kali dibuka
   useEffect(() => {
-    const urlLogic = searchParams.get("logic") as LogicType;
+    // const urlLogic = searchParams.get("logic") as LogicType;
+    const urlLogic = (searchParams.get("logic") as LogicType) || "AND";
     if (urlLogic) {
       setOperatorLogic(urlLogic);
     }

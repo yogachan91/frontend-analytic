@@ -67,7 +67,7 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
             <div className="font-semibold mb-1">Severity</div>
             <Legend label="High" color="bg-orange-500" />
             <Legend label="Critical" color="bg-red-500" />
-            <Legend label="Information" color="bg-yellow-500" />
+            <Legend label="Information" color="bg-yellow-400" />
           </div>
         </div>
         {/* Source + Count (CLICKABLE) */}

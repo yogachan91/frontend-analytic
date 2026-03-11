@@ -389,16 +389,16 @@ export function useFilteredEvents(
   //   fetchEvents();
   // }, [fetchEvents]);
   // EFFECT 1: Khusus untuk memicu loading saat TIMEFRAME berubah
-  useEffect(() => {
-    fetchEvents(true); // Panggil dengan loading true
-  }, [timeframe]); // Hanya trigger jika timeframe berubah
+  // useEffect(() => {
+  //   fetchEvents(true); // Panggil dengan loading true
+  // }, [timeframe]); // Hanya trigger jika timeframe berubah
 
   // EFFECT 2: Untuk perubahan filter atau search query (opsional: tanpa loading berat)
   useEffect(() => {
     // Kita cek jika ini bukan mount pertama atau bukan karena ganti timeframe
     // agar tidak double fetch dengan effect di atas
     fetchEvents(true); 
-  }, [searchQuery, filters, operatorLogic, fetchEvents]);
+  }, [fetchEvents]);
 
   return { events, loading, totalCount, refetch: () => fetchEvents(true) };
 }
