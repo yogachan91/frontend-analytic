@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Globe as GlobeIcon } from 'lucide-react';
 import { MetricCard } from '@/components/shared/MetricCard';
 import AttackGlobe, { MapAttack} from '@/components/globe/AttackMap2D';
-import { navigateToSearchWithCountry } from '@/utils/navigation';
+import { navigateToSearchWithCountry, navigateToSearchWithSeverity } from '@/utils/navigation';
 import { GeoAttack } from '@/types/security';
 
 // 🔥 Dummy data
@@ -20,6 +20,15 @@ const SOURCE_COLORS: Record<string, string> = {
   Unknown: 'bg-yellow-400',
 };
 
+const SEVERITY_COLORS: Record<string, string> = {
+  High: 'bg-orange-500',
+  high: 'bg-orange-500',
+  Critical: 'bg-red-500',
+  critical: 'bg-red-500',
+  Information: 'bg-yellow-400',
+  information: 'bg-yellow-400',
+};
+
 interface GlobeMapProps {
   attacks?: GeoAttack[];
 }
@@ -31,6 +40,11 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
   const handleCountryClick = (country: string) => {
     navigate(navigateToSearchWithCountry(country));
   };
+
+  const handleSeverityClick = (stage: string) => {
+    navigate(navigateToSearchWithSeverity(stage));
+  };
+  
 
   /* ================= DATA ================= */
   const globeData: MapAttack[] =
@@ -47,12 +61,28 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
       : (attackData as MapAttack[]);
 
   /* ================= COUNT PER SOURCE ================= */
-  const sourceCount = (attacks || []).reduce<Record<string, number>>((acc, item) => {
-    const key = item.sourceCountry ?? 'Unknown';
-    // Gunakan attackCount dari JSON, bukan + 1
-    acc[key] = (acc[key] || 0) + item.attackCount; 
-    return acc;
-  }, {});
+  // const sourceCount = (attacks || []).reduce<Record<string, number>>((acc, item) => {
+  //   const key = item.sourceCountry ?? 'Unknown';
+  //   // Gunakan attackCount dari JSON, bukan + 1
+  //   acc[key] = (acc[key] || 0) + item.attackCount; 
+  //   return acc;
+  // }, {});
+
+  const { sourceCount, severityCount } = (attacks || []).reduce(
+    (acc, item) => {
+      // Hitung Source
+      const sKey = item.sourceCountry ?? 'Unknown';
+      acc.sourceCount[sKey] = (acc.sourceCount[sKey] || 0) + item.attackCount;
+
+      // Hitung Severity
+      const sevKey = item.severity ?? 'Information';
+      acc.severityCount[sevKey] = (acc.severityCount[sevKey] || 0) + item.attackCount;
+
+      return acc;
+    },
+    { sourceCount: {} as Record<string, number>, severityCount: {} as Record<string, number> }
+  );
+  
 
   return (
     <MetricCard title="Global Attack Map" icon={GlobeIcon} className="h-full">
@@ -65,9 +95,16 @@ export function GlobeMap({ attacks }: GlobeMapProps) {
           {/* Severity */}
           <div>
             <div className="font-semibold mb-1">Severity</div>
-            <Legend label="High" color="bg-orange-500" />
-            <Legend label="Critical" color="bg-red-500" />
-            <Legend label="Information" color="bg-yellow-400" />
+            <div className="space-y-1">
+              {Object.entries(severityCount).map(([sev, count]) => (
+                <Legend
+                  key={sev}
+                  label={`${sev}`}
+                  color={SEVERITY_COLORS[sev] ?? 'bg-grey-400'}
+                  onClick={() => handleSeverityClick(sev)}
+                />
+              ))}
+            </div>
           </div>
         </div>
         {/* Source + Count (CLICKABLE) */}

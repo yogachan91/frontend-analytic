@@ -72,10 +72,20 @@ export function navigateToSearchWithMitreStage(stage: MitreStageType): string {
   ]);
 }
 
-export function navigateToSearchWithEventType(stage: MitreStageType): string {
+export function navigateToSearchWithEventType(stage: string): string {
   return buildSearchURL([
     {
       field: "event_type",
+      operator: "is",
+      value: stage,
+    },
+  ]);
+}
+
+export function navigateToSearchWithSeverity(stage: string): string {
+  return buildSearchURL([
+    {
+      field: "severity",
       operator: "is",
       value: stage,
     },
